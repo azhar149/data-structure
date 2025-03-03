@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+int stringToInt(const char* str) {
+    int num = 0;
+    int sign = 1;
+
+    if (str[0] == '-') {
+        sign = -1;
+        str++;
+    }
+
+    while (*str != '\0') {
+        num = num * 10 + (*str - '0');
+        str++;
+    }
+
+    return sign * num;
+}
+
+int calPoints(char** ops, int opsSize) {
+    int *record = (int *)malloc(opsSize * sizeof(int));
+    int recordSize = 0;
+    int sum = 0;
+
+    for (int i = 0; i < opsSize; i++) {
+        char* op = ops[i];
+
+        if (isdigit(op[0]) || (op[0] == '-' && isdigit(op[1]))) {
+            int score = stringToInt(op);
+            record[recordSize++] = score;
+            sum += score;
+        }
+        else if (op[0] == '+') {
+            int score = record[recordSize - 1] + record[recordSize - 2];
+            record[recordSize++] = score;
+            sum += score;
+        }
+        else if (op[0] == 'D') {
+            int score = 2 * record[recordSize - 1];
+            record[recordSize++] = score;
+            sum += score;
+        }
+        else if (op[0] == 'C') {
+            sum -= record[recordSize - 1];
+            recordSize--;
+        }
+    }
+
+    free(record);
+    return sum;
+}
